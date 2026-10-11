@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#baff42">
+<title>AI 全域营销文案矩阵 · Spark Copy</title>
+<meta name="description" content="一次输入产品信息，自动产出小红书、抖音、朋友圈、公众号、电商详情页、微博六大平台的营销文案，并对每条文案做钩子强度与转化力评分。">
+<link rel="stylesheet" href="assets/style.css"
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✍️</text></svg>">
+<style>
+  .platform-group { margin-bottom: 26px; }
+  .platform-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .platform-icon {
+    width: 32px; height: 32px; border-radius: 10px; flex: none;
+    display: grid; place-items: center; font-size: 16px;
+    background: var(--surface-2); border: 1px solid var(--line);
+  }
+  .copy-card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 17px; margin-bottom: 11px;
+    transition: .2s; position: relative;
+  }
+  .copy-card:hover { border-color: var(--line-strong); background: var(--surface-2); }
+  .copy-body {
+    white-space: pre-wrap; font-size: 14.2px; line-height: 1.82;
+    color: var(--text); word-break: break-word;
+  }
+  .copy-body .hl { color: #c4b5fd; font-weight: 600; }
+  .copy-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+  .copy-tags span {
+    font-size: 12px; color: #93c5fd; background: rgba(96,165,250,.1);
+    border: 1px solid rgba(96,165,250,.22); padding: 2px 8px; border-radius: 6px;
+  }
+  .copy-foot {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 13px; padding-top: 12px; border-top: 1px dashed var(--line);
+  }
+  .score-row { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--text-faint); }
+  .score-row .bar { width: 46px; height: 5px; }
+  .shot-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .shot-table td { padding: 7px 10px; vertical-align: top; border-bottom: 1px solid var(--line); }
+  .shot-table td:first-child {
+    white-space: nowrap; color: var(--brand-2); font-family: var(--mono);
+    font-size: 12px; width: 1%; font-weight: 600;
+  }
+  .shot-table tr:last-child td { border-bottom: none; }
+  .mini-stat { display:flex; gap:18px; flex-wrap:wrap; }
+  .mini-stat > div { font-size: 12px; color: var(--text-faint); }
+  .mini-stat b { display:block; font-size:19px; color:var(--text); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<header id="topbar"></header>
+
+<main class="wrap tool-page">
+
+  <div class="tool-hero fade-in">
+    <span class="eyebrow">TOOL 01 · CONTENT AUTOMATION</span>
+    <h1 style="margin-top:14px">AI 全域营销<span class="gradient-text">文案矩阵</span>工作台</h1>
+    <p class="muted" style="max-width:760px">
+      填一次产品信息，<b style="color:var(--text)">6 个平台 × 多条文案</b>同时产出，并自动完成钩子强度、情绪价值、
+      行动召唤三维评分。把「一个文案写一下午」压缩到 10 秒，运营可直接复制投放。
+    </p>
+  </div>
+
+  <div class="split">
+    <!-- ======================= 左：输入 ======================= -->
+    <div class="sticky-col stack gap-16">
+      <div class="card fade-in">
+        <div class="section-title"><span class="step">1</span>产品信息</div>
+
+        <label class="field">
+          <span class="field-label">产品 / 服务名称 <span class="req">*</span></span>
+          <input type="text" id="f-product" placeholder="例：零糖气泡水 · 青提味">
+        </label>
+
+        <label class="field">
+          <span class="field-label">核心卖点（每行一个，建议 3–5 条）<span class="req">*</span></span>
+          <textarea id="f-points" rows="4" placeholder="0 糖 0 卡 0 脂&#10;真果汁调味，不是香精&#10;一瓶只要 3.9 元&#10;便利店同款，囤货更划算"></textarea>
+        </label>
+
+        <label class="field">
+          <span class="field-label">目标人群</span>
+          <input type="text" id="f-audience" placeholder="例：18–30 岁减脂女生 / 健身党">
+        </label>
+
+        <div class="row gap-12">
+          <label class="field" style="flex:1">
+            <span class="field-label">价格 / 活动</span>
+            <input type="text" id="f-offer" placeholder="例：第二件半价">
+          </label>
+          <label class="field" style="flex:1">
+            <span class="field-label">每平台条数</span>
+            <select id="f-count">
+              <option value="2">2 条</option>
+              <option value="3" selected>3 条</option>
+              <option value="4">4 条</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="section-title"><span class="step">2</span>品牌调性</div>
+        <div class="chips" id="f-tone"></div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="section-title"><span class="step">3</span>投放平台</div>
+        <div class="chips" id="f-platforms"></div>
+      </div>
+
+      <div class="stack gap-8">
+        <button class="btn btn-primary btn-lg btn-block" id="btn-gen">✨ 一键生成文案矩阵</button>
+        <div class="row gap-8">
+          <button class="btn btn-ghost btn-sm" style="flex:1" id="btn-demo">载入示例</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" id="btn-reset">清空</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= 右：结果 ======================= -->
+    <div class="stack gap-16">
+      <div class="card" id="summary" style="display:none">
+        <div class="row gap-16" style="flex-wrap:wrap">
+          <div class="mini-stat" style="flex:1">
+            <div>生成条数<b id="s-count">0</b></div>
+            <div>覆盖平台<b id="s-plat">0</b></div>
+            <div>平均转化力<b id="s-score">0</b></div>
+            <div>总字数<b id="s-words">0</b></div>
+          </div>
+          <div class="row gap-8">
+            <button class="btn btn-sm" id="btn-copy-all">📋 全部复制</button>
+            <button class="btn btn-sm" id="btn-export">⬇ 导出 Markdown</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="output">
+        <div class="card empty">
+          <div class="big">✍️</div>
+          <h3 style="color:var(--text-dim);font-weight:600">左侧填写信息，开始生成</h3>
+          <p class="small" style="margin-top:8px">没有头绪？点一下「载入示例」立刻看到效果。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer center">
+    AI 营销工具箱 · 文案矩阵工作台 ｜ 纯前端实现，数据不出浏览器
+  </footer>
+</main>
+
+<script src="assets/ai.js"></script>
+<script>
+/* ======================================================================
+   文案生成引擎
+   ====================================================================== */
+const { $, $$, esc, fmt, clamp, pick, shuffle, toast, copy, download, renderTopbar } = UI;
+renderTopbar();
+
+/* ------------------------------------------------ 调性词库 */
+const TONES = {
+  seed:  { key:"seed",  label:"🌱 种草闺蜜", desc:"亲切、真实、第一人称安利",
+           words:["真的会谢","谁懂啊","blblbl","冲就完事了","无效踩雷","闭眼入"],
+           emo:["🥹","😭","🫶","✨","💗","🤤"] },
+  pro:   { key:"pro",   label:"🎯 专业权威", desc:"数据、成分、对比、可信",
+           words:["实测","对照组","参数拉满","行业基准","可追溯","经得起查"],
+           emo:["📊","✅","🔬","📈"] },
+  fun:   { key:"fun",   label:"🤪 幽默整活", desc:"反差、梗、玩梗互动",
+           words:["离谱","笑死","被创到了","我宣布","主打一个","报警了"],
+           emo:["🤣","😂","🙃","🫠","👀"] },
+  lux:   { key:"lux",   label:"🖤 高级极简", desc:"克制、留白、质感",
+           words:["克制","分寸","留白","本该如此","少即是多","经得起时间"],
+           emo:["◼︎","·","—"] },
+  hype:  { key:"hype",  label:"🔥 热血促销", desc:"紧迫、利益点前置",
+           words:["最后一天","手慢无","直接砍到","冲","别等了","史低"],
+           emo:["🔥","⚡","⏰","💥","🚨"] },
+};
+
+/* ------------------------------------------------ 平台定义 */
+const PLATFORMS = {
+  xhs:    { key:"xhs",    name:"小红书笔记", icon:"📕", ideal:[180,420], desc:"标题+正文+话题" },
+  douyin: { key:"douyin", name:"抖音口播脚本", icon:"🎬", ideal:[220,520], desc:"分镜+时间轴" },
+  moments:{ key:"moments",name:"朋友圈 / 私域", icon:"💬", ideal:[40,140],  desc:"短平快，带钩子" },
+  wechat: { key:"wechat", name:"公众号标题", icon:"📰", ideal:[12,30],   desc:"爆款标题矩阵" },
+  ecom:   { key:"ecom",   name:"电商详情页", icon:"🛒", ideal:[60,220],  desc:"卖点短句矩阵" },
+  weibo:  { key:"weibo",  name:"微博 / 视频号", icon:"🌐", ideal:[60,180], desc:"话题式短文案" },
+};
+
+/* ------------------------------------------------ 钩子库 */
+const HOOKS = {
+  pain:  ["别再{wrong}了","{audience}最怕的不是{pain}，而是{pain2}","踩了 3 次坑才明白","我真的受够了{pain}"],
+  num:   ["{n} 块钱买到的快乐","试了 {n} 款，只留下这一个","{n} 天，我把{pain}解决了","连续用了 {n} 周之后"],
+  ask:   ["你有没有过这种时候？","凭什么{wrong}？","这玩意儿凭什么卖这么好？","为什么没人早点告诉我？"],
+  anti:  ["不是我吹，是它真的离谱","劝你别看，看了就想买","本来只想随便试试","我原本是不信的"],
+  value: ["{audience}的嘴替来了","把{benefit}这件事做到了极致","今年最值的一笔小钱","闭眼冲的理由只有一个"],
+};
+
+const PAINS = ["选择困难","踩雷","智商税","反复纠结","浪费钱","时间不够用","效果打折"];
+const WRONGS = ["花冤枉钱","凭感觉选","被包装骗","随便买了就用"];
+
+/* ------------------------------------------------ 小工具 */
+const rnd = (a) => a[Math.floor(Math.random() * a.length)];
+const takeN = (arr, n) => shuffle(arr).slice(0, Math.max(1, Math.min(n, arr.length)));
+
+function fill(tpl, ctx) {
+  return tpl
+    .replace(/\{product\}/g, ctx.product)
+    .replace(/\{audience\}/g, ctx.audience)
+    .replace(/\{benefit\}/g, rnd(ctx.points))
+    .replace(/\{benefit2\}/g, ctx.points.length > 1 ? rnd(ctx.points) : rnd(ctx.points))
+    .replace(/\{offer\}/g, ctx.offer)
+    .replace(/\{pain\}/g, rnd(PAINS))
+    .replace(/\{pain2\}/g, rnd(PAINS))
+    .replace(/\{wrong\}/g, rnd(WRONGS))
+    .replace(/\{n\}/g, String(3 + Math.floor(Math.random() * 20)));
+}
+const hook = (ctx) => fill(rnd([].concat(HOOKS.pain, HOOKS.num, HOOKS.ask, HOOKS.anti, HOOKS.value)), ctx);
+
+/* ------------------------------------------------ 各平台生成器 */
+const GEN = {
+  xhs(ctx, i) {
+    const t = ctx.tone;
+    const titles = [
+      `${rnd(t.emo)}${hook(ctx)}｜${ctx.product}`,
+      `救命！${ctx.product}是真的可以无脑入 ${rnd(t.emo)}`,
+      `${ctx.audience}快看过来，${ctx.points[0]}`,
+      `${ctx.product}测评 | 优点缺点我都说了`,
+    ];
+    const body = [
+      `${rnd(titles)}\n`,
+      `说实话，我一开始也觉得${rnd(PAINS)}，直到用了${ctx.product}。\n`,
+      ctx.points.map((p, k) => `${["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"][k] || "▪️"} ${p}`).join("\n"),
+      `\n${rnd(t.words)}，${ctx.offer ? "现在还有「" + ctx.offer + "」，" : ""}真心推荐给${ctx.audience}。`,
+      `\n有问题评论区问我，看到都会回 ${rnd(t.emo)}`,
+    ].join("\n");
+    return { text: body, tags: ctx.tags };
+  },
+
+  douyin(ctx) {
+    const t = ctx.tone;
+    const rows = [
+      ["0–3s｜钩子", `${hook(ctx)}（手持产品怼镜头，字幕放大）`],
+      ["3–8s｜痛点", `${ctx.audience}是不是也遇到过${rnd(PAINS)}？我试过太多次了。`],
+      ["8–20s｜转折", `直到我用上${ctx.product}——${ctx.points[0]}。`],
+      ["20–35s｜论证", ctx.points.slice(1).map((p) => "· " + p).join("\n") || "· 细节拉满，经得起对比"],
+      ["35–45s｜信任", `${rnd(t.words)}，不吹不黑，效果你自己看画面。`],
+      ["45–55s｜转化", `${ctx.offer ? ctx.offer + "，" : ""}点下方小黄车，评论区扣「要」我发链接给你。`],
+    ];
+    return {
+      text: rows.map((r) => r[0] + "\n" + r[1]).join("\n\n"),
+      shots: rows,
+      tags: ctx.tags,
+    };
+  },
+
+  moments(ctx) {
+    const t = ctx.tone;
+    return {
+      text: [
+        `${rnd(t.emo)} ${hook(ctx)}`,
+        ``,
+        `${ctx.product}｜${ctx.points.slice(0, 2).join(" · ")}`,
+        ctx.offer ? `${ctx.offer}，名额不多，先到先得。` : `用过的朋友基本都回购了。`,
+        `想要的扣 1，我私发你 👇`,
+      ].join("\n"),
+      tags: [],
+    };
+  },
+
+  wechat(ctx) {
+    const list = [
+      `${hook(ctx)}：${ctx.product}到底值不值？`,
+      `我们拆了 ${3 + Math.floor(Math.random() * 7)} 款同类产品，结论有点意外`,
+      `${ctx.audience}必看：关于${ctx.product}，99% 的人都搞错了这 3 点`,
+      `${ctx.points[0]}，这件事比你想的更重要`,
+      `别再${rnd(WRONGS)}了，这份清单请收好`,
+      `从 0 到 1 复盘：${ctx.product}是怎么做到${ctx.points[0]}的`,
+      `${ctx.offer || "好东西"}，但我更想聊聊它背后的逻辑`,
+      `如果只推荐一个给${ctx.audience}，我选它`,
+    ];
+    return { text: takeN(list, 5).map((s, i) => `${i + 1}. ${s}`).join("\n"), tags: [] };
+  },
+
+  ecom(ctx) {
+    const blocks = ctx.points.map((p, i) => `【卖点${i + 1}】${p}\n  主图文案：${p.length > 10 ? p.slice(0, 10) : p}${rnd(["，看得见的差别","，一用就知道","，拒绝将就"])}`);
+    return {
+      text: [
+        `▌主标题：${ctx.product}｜${ctx.points[0]}`,
+        `▌副标题：${ctx.audience}的${rnd(["省心之选","日常刚需","回购理由"])}${ctx.offer ? "｜" + ctx.offer : ""}`,
+        ``,
+        blocks.join("\n"),
+        ``,
+        `▌转化区：${ctx.offer || "限时特惠"}｜7 天无理由｜顺丰包邮｜已有 ${(8 + Math.floor(Math.random() * 90))}00+ 人回购`,
+      ].join("\n"),
+      tags: [],
+    };
+  },
+
+  weibo(ctx) {
+    const t = ctx.tone;
+    return {
+      text: [
+        `#${ctx.product}# ${hook(ctx)}`,
+        ``,
+        `${ctx.points.slice(0, 3).map((p) => "✔ " + p).join("  ")}`,
+        `${ctx.offer ? "⏰ " + ctx.offer + "  " : ""}${rnd(t.words)}。`,
+        `转发抽 3 位送同款，${rnd(["周五开奖","48 小时后开奖"])} ${rnd(t.emo)}`,
+      ].join("\n"),
+      tags: ctx.tags,
+    };
+  },
+};
+
+/* ------------------------------------------------ 文案评分（启发式，非随机） */
+const POWER = ["免费","限时","最后","立省","买一送一","半价","第二件","0元","包邮","独家","首发","爆款","回购","实测","官方","正品"];
+const EMO_WORDS = ["真的","居然","终于","竟然","谁懂","救命","离谱","绝了","爱了","后悔","值得","心动","惊艳","踩雷"];
+const CTA_WORDS = ["点击","戳","下单","领取","私信","评论区","扣1","小黄车","收藏","关注","立即","马上","抢","预约","加购"];
+
+function scoreCopy(text, platform) {
+  const t = String(text);
+  const first = t.split("\n").find((l) => l.trim()) || "";
+  const len = t.replace(/\s/g, "").length;
+
+  // 钩子强度：首句要短、带数字、带疑问/感叹、带强钩子词
+  let hookS = 36;
+  if (first.length <= 24) hookS += 20; else if (first.length <= 38) hookS += 10;
+  if (/\d/.test(first)) hookS += 12;
+  if (/[？?！!]/.test(first)) hookS += 11;
+  if (/别再|千万|终于|原来|居然|谁懂|救命|凭什么|不是我/.test(first)) hookS += 16;
+  if (/^#/.test(first)) hookS += 5;
+
+  // 情绪价值：emoji + 情绪词 + 感叹号密度
+  const emoji = (t.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) || []).length;
+  let emoS = 30 + clamp(emoji * 6, 0, 26);
+  emoS += clamp(EMO_WORDS.filter((w) => t.includes(w)).length * 8, 0, 28);
+  emoS += clamp(((t.match(/[！!]/g) || []).length) * 4, 0, 12);
+
+  // 行动召唤：CTA 词 + 利益词
+  let ctaS = 24;
+  ctaS += clamp(CTA_WORDS.filter((w) => t.includes(w)).length * 13, 0, 46);
+  ctaS += clamp(POWER.filter((w) => t.includes(w)).length * 9, 0, 28);
+
+  // 平台契合：长度落在理想区间
+  const [lo, hi] = PLATFORMS[platform].ideal;
+  let fitS;
+  if (len < lo) fitS = 55 + (len / lo) * 35;
+  else if (len > hi) fitS = clamp(92 - ((len - hi) / hi) * 55, 42, 92);
+  else fitS = 88 + ((len - lo) / Math.max(1, hi - lo)) * 10;
+
+  const s = {
+    hook: Math.round(clamp(hookS, 20, 99)),
+    emotion: Math.round(clamp(emoS, 20, 99)),
+    cta: Math.round(clamp(ctaS, 20, 99)),
+    fit: Math.round(clamp(fitS, 20, 99)),
+  };
+  s.total = Math.round(s.hook * 0.3 + s.emotion * 0.25 + s.cta * 0.27 + s.fit * 0.18);
+  return s;
+}
+
+function tone3(v) { return v >= 80 ? "ok" : v >= 62 ? "warn" : "bad"; }
+
+/* ------------------------------------------------ 上下文构建 */
+function buildCtx() {
+  const product = $("#f-product").value.trim();
+  const points = $("#f-points").value.split("\n").map((s) => s.trim()).filter(Boolean);
+  if (!product) { toast("请先填写产品名称", "bad"); $("#f-product").focus(); return null; }
+  if (!points.length) { toast("至少填写一条核心卖点", "bad"); $("#f-points").focus(); return null; }
+
+  const toneKey = ($(".chip.on", $("#f-tone")) || {}).dataset?.k || "seed";
+  const plats = $$("#f-platforms .chip.on").map((c) => c.dataset.k);
+  if (!plats.length) { toast("请至少选择一个投放平台", "bad"); return null; }
+
+  const audience = $("#f-audience").value.trim() || "想变更好的你";
+  const kw = product.replace(/[·\s|｜]/g, "").slice(0, 6);
+  return {
+    product, points, audience,
+    offer: $("#f-offer").value.trim(),
+    tone: TONES[toneKey],
+    platforms: plats,
+    count: parseInt($("#f-count").value, 10),
+    tags: ["#" + kw, "#" + (audience.slice(0, 6)) + "必看", "#好物分享", "#亲测有效", "#" + kw + "推荐"],
+  };
+}
+
+/* ------------------------------------------------ LLM 提示词 */
+function llmPrompt(ctx, p) {
+  return [
+    { role: "system", content:
+      "你是一位顶尖的中文新媒体营销文案专家，精通小红书、抖音、朋友圈、公众号、电商详情页、微博的平台调性与算法偏好。" +
+      "输出必须可直接发布，不要任何解释、不要 Markdown 标题符号。" },
+    { role: "user", content:
+      `请为以下产品写 ${ctx.count} 条【${PLATFORMS[p].name}】文案。\n` +
+      `产品：${ctx.product}\n核心卖点：\n${ctx.points.map((x) => "- " + x).join("\n")}\n` +
+      `目标人群：${ctx.audience}\n价格/活动：${ctx.offer || "无"}\n品牌调性：${ctx.tone.label}（${ctx.tone.desc}）\n\n` +
+      (p === "douyin" ? "每条用「时间轴｜画面/口播」的分镜形式，覆盖 0-3s 钩子到 55s 转化。\n" : "") +
+      (p === "wechat" ? "每条是一个可点击的爆款标题，控制在 30 字内。\n" : "") +
+      `严格以 JSON 数组返回，格式：[{"text":"文案正文","tags":["#话题1","#话题2"]}]，不要输出其它内容。` },
+  ];
+}
+
+/* ------------------------------------------------ 渲染 */
+let LAST = null;
+
+function cardHTML(item, p, idx) {
+  const s = item.score;
+  const shots = item.shots
+    ? `<table class="shot-table">${item.shots.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1]).replace(/\n/g, "<br>")}</td></tr>`).join("")}</table>`
+    : `<div class="copy-body">${esc(item.text)}</div>`;
+
+  return `<div class="copy-card fade-in" data-p="${p}" data-i="${idx}" style="animation-delay:${idx * 60}ms">
+    ${shots}
+    ${item.tags && item.tags.length ? `<div class="copy-tags">${item.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>` : ""}
+    <div class="copy-foot">
+      <span class="tag ${s.total >= 80 ? "tag-ok" : s.total >= 65 ? "tag-warn" : "tag-bad"}">转化力 ${s.total}</span>
+      <div class="score-row" title="首句是否足够抓人">钩子<span class="bar ${tone3(s.hook)}"><i style="width:${s.hook}%"></i></span>${s.hook}</div>
+      <div class="score-row" title="情绪词与 emoji 密度">情绪<span class="bar ${tone3(s.emotion)}"><i style="width:${s.emotion}%"></i></span>${s.emotion}</div>
+      <div class="score-row" title="行动指令明确度">召唤<span class="bar ${tone3(s.cta)}"><i style="width:${s.cta}%"></i></span>${s.cta}</div>
+      <div class="score-row" title="字数是否符合平台习惯">适配<span class="bar ${tone3(s.fit)}"><i style="width:${s.fit}%"></i></span>${s.fit}</div>
+      <span class="spacer"></span>
+      <button class="btn btn-sm btn-ghost act-copy">复制</button>
+      <button class="btn btn-sm btn-ghost act-regen">换一条</button>
+    </div>
+  </div>`;
+}
+
+function render(result) {
+  LAST = result;
+  const html = result.platforms
+    .map((pg) => `<div class="platform-group">
+        <div class="platform-head">
+          <span class="platform-icon">${PLATFORMS[pg.key].icon}</span>
+          <div style="flex:1">
+            <h3>${PLATFORMS[pg.key].name}</h3>
+            <div class="tiny faint">${PLATFORMS[pg.key].desc} · ${pg.items.length} 条</div>
+          </div>
+          <span class="tag ${pg.mode === "llm" ? "tag-brand" : ""}">${pg.mode === "llm" ? "大模型生成" : "离线引擎"}</span>
+        </div>
+        ${pg.items.map((it, i) => cardHTML(it, pg.key, i)).join("")}
+      </div>`)
+    .join("");
+  $("#output").innerHTML = html;
+
+  const all = result.platforms.flatMap((p) => p.items);
+  $("#summary").style.display = "";
+  $("#s-count").textContent = all.length;
+  $("#s-plat").textContent = result.platforms.length;
+  $("#s-score").textContent = Math.round(all.reduce((a, b) => a + b.score.total, 0) / all.length);
+  $("#s-words").textContent = all.reduce((a, b) => a + b.text.replace(/\s/g, "").length, 0);
+
+  bindCardEvents();
+}
+
+function bindCardEvents() {
+  $$(".act-copy").forEach((b) =>
+    b.addEventListener("click", (e) => {
+      const card = e.target.closest(".copy-card");
+      const it = LAST.platforms.find((p) => p.key === card.dataset.p).items[+card.dataset.i];
+      copy(it.text + (it.tags && it.tags.length ? "\n\n" + it.tags.join(" ") : ""), "文案");
+    })
+  );
+  $$(".act-regen").forEach((b) =>
+    b.addEventListener("click", (e) => {
+      const card = e.target.closest(".copy-card");
+      const p = card.dataset.p, i = +card.dataset.i;
+      const ctx = LAST.ctx;
+      const fresh = GEN[p](ctx);
+      fresh.score = scoreCopy(fresh.text, p);
+      LAST.platforms.find((x) => x.key === p).items[i] = fresh;
+      card.outerHTML = cardHTML(fresh, p, i);
+      bindCardEvents();
+      toast("已重新生成", "ok");
+    })
+  );
+}
+
+/* ------------------------------------------------ 主流程 */
+async function generate() {
+  const ctx = buildCtx();
+  if (!ctx) return;
+
+  const btn = $("#btn-gen");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> AI 正在创作…';
+  $("#output").innerHTML = ctx.platforms
+    .map(() => '<div class="skeleton" style="height:150px;margin-bottom:12px"></div>').join("");
+
+  const groups = [];
+  for (const p of ctx.platforms) {
+    let mode = "local";
+    let items;
+    try {
+      const r = await AI.run({
+        messages: llmPrompt(ctx, p),
+        json: true, temperature: 0.95, maxTokens: 2200, thinkMs: 260,
+        onMode: (m) => (mode = m),
+        fallback: () => Array.from({ length: ctx.count }, () => GEN[p](ctx)),
+      });
+      items = Array.isArray(r) ? r.slice(0, ctx.count) : [];
+      if (!items.length) throw new Error("empty");
+    } catch (e) {
+      mode = "local";
+      items = Array.from({ length: ctx.count }, () => GEN[p](ctx));
+    }
+    items = items.map((it) => {
+      const o = typeof it === "string" ? { text: it, tags: [] } : it;
+      o.text = String(o.text || "").trim();
+      o.tags = Array.isArray(o.tags) ? o.tags : [];
+      o.score = scoreCopy(o.text, p);
+      return o;
+    });
+    groups.push({ key: p, items, mode });
+  }
+
+  render({ ctx, platforms: groups });
+  btn.disabled = false;
+  btn.innerHTML = "✨ 一键生成文案矩阵";
+  toast("已生成 " + groups.reduce((a, g) => a + g.items.length, 0) + " 条文案", "ok");
+}
+
+/* ------------------------------------------------ 导出 */
+function exportMD() {
+  if (!LAST) return;
+  const c = LAST.ctx;
+  const md = [
+    `# ${c.product} · 全域营销文案矩阵`,
+    ``,
+    `> 生成时间：${new Date().toLocaleString("zh-CN")}　|　调性：${c.tone.label}　|　人群：${c.audience}`,
+    ``,
+    `**核心卖点**`, ...c.points.map((p) => `- ${p}`),
+    c.offer ? `\n**活动**：${c.offer}` : "",
+    ``,
+    ...LAST.platforms.flatMap((pg) => [
+      `\n---\n`,
+      `## ${PLATFORMS[pg.key].icon} ${PLATFORMS[pg.key].name}`,
+      ...pg.items.flatMap((it, i) => [
+        ``,
+        `### 方案 ${i + 1}　\`转化力 ${it.score.total}\`（钩子 ${it.score.hook} / 情绪 ${it.score.emotion} / 召唤 ${it.score.cta} / 适配 ${it.score.fit}）`,
+        ``,
+        it.text.split("\n").map((l) => "> " + l).join("\n"),
+        it.tags.length ? `\n\`${it.tags.join(" ")}\`` : "",
+      ]),
+    ]),
+    ``, `---`, `_由 AI 营销工具箱 · 文案矩阵工作台生成_`,
+  ].join("\n");
+  download(`${c.product}-文案矩阵-${UI.todayISO()}.md`, md, "text/markdown");
+}
+
+function copyAll() {
+  if (!LAST) return;
+  const txt = LAST.platforms
+    .map((pg) => `【${PLATFORMS[pg.key].name}】\n\n` + pg.items.map((it, i) => `方案${i + 1}：\n${it.text}${it.tags.length ? "\n" + it.tags.join(" ") : ""}`).join("\n\n"))
+    .join("\n\n========================\n\n");
+  copy(txt, "全部文案");
+}
+
+/* ------------------------------------------------ 初始化 */
+$("#f-tone").innerHTML = Object.values(TONES)
+  .map((t, i) => `<label class="chip ${i === 0 ? "on" : ""}" data-k="${t.key}" title="${t.desc}">${t.label}</label>`).join("");
+$$("#f-tone .chip").forEach((c) =>
+  c.addEventListener("click", () => { $$("#f-tone .chip").forEach((x) => x.classList.remove("on")); c.classList.add("on"); })
+);
+
+$("#f-platforms").innerHTML = Object.values(PLATFORMS)
+  .map((p, i) => `<label class="chip ${i < 3 ? "on" : ""}" data-k="${p.key}">${p.icon} ${p.name}</label>`).join("");
+$$("#f-platforms .chip").forEach((c) => c.addEventListener("click", () => c.classList.toggle("on")));
+
+$("#btn-gen").addEventListener("click", generate);
+$("#btn-export").addEventListener("click", exportMD);
+$("#btn-copy-all").addEventListener("click", copyAll);
+$("#btn-reset").addEventListener("click", () => {
+  ["f-product", "f-points", "f-audience", "f-offer"].forEach((id) => ($("#" + id).value = ""));
+  $("#output").innerHTML = '<div class="card empty"><div class="big">✍️</div><h3 style="color:var(--text-dim);font-weight:600">左侧填写信息，开始生成</h3></div>';
+  $("#summary").style.display = "none";
+  LAST = null;
+});
+
+const DEMOS = [
+  { product: "零糖气泡水 · 青提味", points: "0 糖 0 卡 0 脂，减脂期也能喝\n真果汁调味，不是香精味\n一瓶只要 3.9 元，便利店同款\n冰镇后气足到冲鼻子", audience: "18–30 岁减脂党 / 办公室女生", offer: "整箱第二件半价" },
+  { product: "AI 简历优化助手", points: "30 秒生成 HR 视角评分报告\n按岗位 JD 自动改写每一条经历\n内置 200+ 行业动词库\n导出 PDF，排版一键对齐", audience: "应届生与 3 年内换工作的职场人", offer: "新用户首份免费" },
+  { product: "便携冷萃咖啡液", points: "0 添加，冷萃 12 小时\n一颗兑 300ml，冰美式 10 秒搞定\n常温可存 6 个月，带去办公室不洒\n单颗不到 4 元，比买一杯省 70%", audience: "每天至少一杯咖啡的打工人", offer: "下单送冰杯" },
+];
+$("#btn-demo").addEventListener("click", () => {
+  const d = rnd(DEMOS);
+  $("#f-product").value = d.product;
+  $("#f-points").value = d.points;
+  $("#f-audience").value = d.audience;
+  $("#f-offer").value = d.offer;
+  toast("示例已载入，点击生成试试");
+});
+</script>
+</body>
+</html>
