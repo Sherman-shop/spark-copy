@@ -1,0 +1,35 @@
+/* Spark Copy · 专属视觉主题 / 独立于原始共享样式 */
+:root{--bg:#16191d;--bg-soft:#232629;--surface:rgba(255,255,255,.055);--surface-2:rgba(186,255,66,.11);--surface-solid:#272b2e;--line:rgba(255,255,255,.17);--line-strong:rgba(186,255,66,.53);--text:#f6f7ef;--text-dim:#bdc1b5;--text-faint:#8f9788;--brand:#baff42;--brand-2:#baff42;--brand-3:#ff73cb;--accent-grad:linear-gradient(120deg,#baff42,#53e6cc);--ok:#a9f46e;--bad:#ff8692;--warn:#f8c55f;}
+body{background:var(--bg);color:var(--text);}
+body::before,body::after{filter:blur(92px);}
+body::before{background:radial-gradient(circle,rgba(54,230,192,.16),transparent 70%)}
+body::after{background:radial-gradient(circle,rgba(125,100,230,.16),transparent 70%)}
+.topbar{background:rgba(7,19,22,.85);border-bottom:1px solid var(--line);}
+.brand{font-size:16px}.brand small{color:var(--text-faint)}
+.brand-mark{background:var(--accent-grad);color:#17191e;font-weight:900}
+.tool-hero{padding:22px 0 20px;margin-bottom:24px;}
+.tool-hero h1{font-weight:850;letter-spacing:-.04em;max-width:840px;}
+.tool-hero .eyebrow{font-weight:800;letter-spacing:.17em;color:var(--brand-2);border-color:var(--line-strong);background:var(--surface-2)}
+.gradient-text{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card,.kpi,.node,.seg-card,.copy-card,.verdict-card{border-color:var(--line);box-shadow:0 12px 36px -24px rgba(0,0,0,.8);}
+.card-head{border-color:var(--line)}
+.btn-primary{background:var(--accent-grad);color:#072022;border:0}
+.btn-primary:hover{background:var(--accent-grad);filter:brightness(1.06)}
+.btn{border-color:var(--line-strong)}
+.nav-link{color:var(--text-dim)}.nav-link:hover{color:var(--text);background:var(--surface-2)}
+input[type=text],input[type=number],input[type=password],input[type=date],textarea,select{background:rgba(1,12,15,.43);color:var(--text);border-color:var(--line-strong);}
+input::placeholder,textarea::placeholder{color:var(--text-faint)}
+select option{background:var(--surface-solid);color:var(--text)}
+.kpi-label,.field-label,.muted{color:var(--text-dim)}.faint,.tiny{color:var(--text-faint)}
+.kpi-value{color:var(--text)}
+.tag{background:var(--surface-2);border-color:var(--line);color:var(--text-dim)}
+.callout{color:var(--text-dim)}.callout-info{background:var(--surface-2);border-color:var(--line-strong)}
+.section-title:before,.kpi:after{background:var(--accent-grad)}
+.footer{color:var(--text-faint);border-color:var(--line)}
+
+
+
+.card,.copy-card{border-radius:2px;box-shadow:5px 5px 0 rgba(186,255,66,.15)}.btn{border-radius:3px;text-transform:uppercase;letter-spacing:.05em}.brand-mark{transform:rotate(-9deg)}.tool-hero h1{text-transform:uppercase;font-weight:950}.eyebrow{border-radius:2px}.topbar{border-bottom:2px solid #baff42}
+
+
+@media(max-width:680px){.tool-hero{padding-top:9px}.card{padding:17px}.topbar-inner{gap:8px}.tool-hero h1{font-size:clamp(27px,7vw,38px)}}
