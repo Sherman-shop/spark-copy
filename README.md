@@ -4,7 +4,7 @@
 
 生成小红书、抖音、朋友圈等六平台营销文案，附文本特征评分。
 
-**在线体验：** 部署后填写 https://你的用户名.github.io/spark-copy/
+**🌐 在线体验：** <https://Sherman-shop.github.io/spark-copy/>
 
 ## 使用方式
 
